@@ -1,10 +1,12 @@
-from fastapi import APIRouter, Path, Query, Body, status, HTTPException
+from fastapi import APIRouter, Path, Query, Body, File, UploadFile, status, HTTPException
 from models.document import DocumentRequest, DocumentResponseByNumber, DocumentResponseByNumberDetail, DocumentResponseByDate, DocumentResponseByDateDetail, DocumentDetailProduct
 from db.client import db
 from bson.objectid import ObjectId
 
 from typing import Annotated
 from datetime import datetime
+import os
+import shutil
 
 
 router = APIRouter(prefix='/document', tags=['Document'])
@@ -239,3 +241,16 @@ async def update_canceled(
         return 'canceled'
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='error, not canceled')
+    
+
+@router.post(path='/uploadfile', status_code=status.HTTP_200_OK, description='Endpoint for Peter')
+async def upload_file(file: UploadFile):
+    try:
+        file_location = os.path.join('./uploads', file.filename)
+
+        with open(file_location, "wb+") as file_object:
+            shutil.copyfileobj(file.file, file_object)
+
+        return {"filename": file.filename, "location": file_location}
+    except Exception as e:
+        return {"error": str(e)}
