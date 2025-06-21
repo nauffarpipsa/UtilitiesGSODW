@@ -127,6 +127,7 @@ async def get_by_date(
                     branch_country = f"{data_dict.get('branch')} / {data_dict.get('country')}",
                     requested_date = data_dict.get('requested_date'),
                     number = data_dict.get('number'),
+                    client_code = data_dict.get('client_code'),
                     client_name = data_dict.get('client_name'),
                     petitioner = data_dict.get('petitioner'),
                     total_amount = data_dict.get('total_amount'),
@@ -245,6 +246,7 @@ async def update_canceled(
 
 @router.post(path='/uploadfile', status_code=status.HTTP_200_OK, description='Endpoint for Peter')
 async def upload_file(file: UploadFile):
+    
     try:
         file_location = os.path.join('./uploads', file.filename)
 

@@ -7,6 +7,7 @@ class DocumentHeaderBase(BaseModel):
     branch: str
     number: str
     type: str
+    client_code: str
     client_name: str
     total_amount: float
     total_contribution: float
@@ -74,6 +75,7 @@ class DocumentResponseByDate(BaseModel):
     branch_country: str
     requested_date: str
     number: str
+    client_code: str
     client_name: str
     petitioner: str
     total_amount: float
