@@ -131,7 +131,10 @@ async def get_by_date(
                     client_name = data_dict.get('client_name'),
                     petitioner = data_dict.get('petitioner'),
                     total_amount = data_dict.get('total_amount'),
+                    total_freight = data_dict.get('total_freight'),
+                    total_isv = data_dict.get('total_isv'),
                     total_contribution = data_dict.get('total_contribution'),
+                    path_file = data_dict.get('path_file'),
                     authorization_detail = []
                 )
 
@@ -175,7 +178,8 @@ async def get_by_date(
 async def update_autorized(
     id: Annotated[str, Path()], 
     authorization_type: Annotated[str, Query()],
-    comment: Annotated[str | None, Query()] = None
+    comment: Annotated[str | None, Query()] = None,
+    path_file: Annotated[str | None, Query()] = None
 ):
     try:
         db.local.documents.find_one_and_update(
@@ -185,6 +189,7 @@ async def update_autorized(
             },
             {
                 '$set': {
+                    'path_file': path_file,
                     'authorization_detail.$.autorized': True, 
                     'authorization_detail.$.approver_comment': comment,
                     'authorization_detail.$.authorized_date': datetime.now().date().strftime('%Y-%m-%d')
@@ -240,6 +245,7 @@ async def update_canceled(
             }
         )
         return 'canceled'
+            
     except:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='error, not canceled')
     
@@ -253,6 +259,6 @@ async def upload_file(file: UploadFile):
         with open(file_location, "wb+") as file_object:
             shutil.copyfileobj(file.file, file_object)
 
-        return {"filename": file.filename, "location": file_location}
+        return { "path": file_location }
     except Exception as e:
-        return {"error": str(e)}
+        return { "error": str(e) }
