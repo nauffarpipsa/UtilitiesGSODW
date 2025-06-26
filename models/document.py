@@ -14,7 +14,6 @@ class DocumentHeaderBase(BaseModel):
     total_isv: float | None
     total_contribution: float
     petitioner: str
-    path_file: str | None
 
 
 class DocumentDetailProduct(BaseModel):

@@ -20,6 +20,7 @@ async def create(documents: Annotated[DocumentRequest, Body()]):
         data_dict['requested_date'] = datetime.now().date().strftime('%Y-%m-%d')
         data_dict['canceled_date'] = None
         data_dict['canceled'] = False
+        data_dict['path_file'] = None
 
         for autorization in list(data_dict['authorization_detail']):
             product_list = []
@@ -45,8 +46,8 @@ async def create(documents: Annotated[DocumentRequest, Body()]):
             'message': 'ok'
         }
     
-    except:
-        raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED, detail='documento no creado')
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED, detail=f'error, {str(e)}')
 
 
 @router.get(path='/get_by_number/{number}', response_model=DocumentResponseByNumber | None, status_code=status.HTTP_200_OK, description='Endpoint for Marvin')
@@ -91,8 +92,8 @@ async def get_by_number(
                     )
                     document.detail.append(data_detail)
         return document
-    except:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='not found')
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'error, {str(e)}')
 
 
 @router.get(path='/get_by_date', response_model=list[DocumentResponseByDate], status_code=status.HTTP_200_OK, description='Endpoint for Peter')
@@ -170,8 +171,8 @@ async def get_by_date(
                             document.authorization_detail.append(auth_detail)
                     documents_list.append(document)
         return documents_list
-    except:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='not found')
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'error, {str(e)}')
     
 
 @router.put(path='/update_autorized/{id}', status_code=status.HTTP_200_OK, description='Endpoint for Peter')
@@ -197,8 +198,8 @@ async def update_autorized(
             }
         )
         return 'autorized'
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='error, not autorized')
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'error, {str(e)}')
 
 
 @router.put(path='/update_refused/{id}', status_code=status.HTTP_200_OK, description='Endpoint for Peter')
@@ -222,8 +223,8 @@ async def update_refused(
             }
         )
         return 'refused'
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='error, not refused')
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'error, {str(e)}')
 
 
 @router.put(path='/update_canceled/{number}', status_code=status.HTTP_200_OK, description='Endpoint for Marvin')
@@ -246,8 +247,8 @@ async def update_canceled(
         )
         return 'canceled'
             
-    except:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='error, not canceled')
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'error, {str(e)}')
     
 
 @router.post(path='/uploadfile', status_code=status.HTTP_200_OK, description='Endpoint for Peter')
@@ -261,4 +262,4 @@ async def upload_file(file: UploadFile):
 
         return { "path": file_location }
     except Exception as e:
-        return { "error": str(e) }
+        raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED, detail=f'error, {str(e)}')
