@@ -10,8 +10,10 @@ class DocumentHeaderBase(BaseModel):
     client_code: str
     client_name: str
     total_amount: float
+    total_freight: float | None
+    total_isv: float | None
     total_contribution: float
-    petitioner: str 
+    petitioner: str
 
 
 class DocumentDetailProduct(BaseModel):
@@ -79,5 +81,8 @@ class DocumentResponseByDate(BaseModel):
     client_name: str
     petitioner: str
     total_amount: float
+    total_freight: float | None
+    total_isv: float | None
     total_contribution: float
+    path_file: str | None
     authorization_detail: list[DocumentResponseByDateDetail] | None
