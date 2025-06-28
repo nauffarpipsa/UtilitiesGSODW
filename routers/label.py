@@ -1,11 +1,10 @@
 from fastapi import APIRouter, status, Query, Body, HTTPException
 
 from db.client import db
-from models.label import LabelAccess, LabelBranch, LabelLocation, Label
+from models.label import LabelAccess, LabelBranch, Label
 from services.label import get_labels
 
 from typing import Annotated
-import json
 
 
 router = APIRouter(prefix='/label', tags=['Label'])
@@ -16,18 +15,15 @@ async def create_access(access: Annotated[LabelAccess, Body()]):
 
     try:
         branchs: list[LabelBranch] = []
-        locations: list[LabelLocation] = []
 
         data_dict = dict(access)
         
         for branch in data_dict['branchs']:
             branch = dict(branch)
-            for location in branch['locations']:
-                locations.append(dict(location))
-            branch['locations'] = locations
             branchs.append(branch)
 
         data_dict['branchs'] = branchs
+
         db.local.labels.insert_one(data_dict)
 
         return {
@@ -49,7 +45,6 @@ async def get_access(user: Annotated[str, Query()]):
             branchs=data_dict.get('branchs')
         )
         return user_access
-
     else:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"error, {str(e)}")
     

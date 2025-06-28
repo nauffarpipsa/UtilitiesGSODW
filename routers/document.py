@@ -15,12 +15,24 @@ router = APIRouter(prefix='/document', tags=['Document'])
 async def create(documents: Annotated[DocumentRequest, Body()]):
     try:
         autorization_list = []
-
         data_dict = dict(documents)
+
         data_dict['requested_date'] = datetime.now().date().strftime('%Y-%m-%d')
         data_dict['canceled_date'] = None
         data_dict['canceled'] = False
         data_dict['path_file'] = None
+
+        db.local.documents.update_many(
+            {
+                'number': data_dict.get('number'), 'country': data_dict.get('country'), 'company': data_dict.get('company')
+            },
+            {
+                '$set': {
+                    'canceled': True,
+                    'canceled_date': datetime.now().date().strftime('%Y-%m-%d')
+                }
+            }
+        )
 
         for autorization in list(data_dict['authorization_detail']):
             product_list = []
@@ -40,6 +52,7 @@ async def create(documents: Annotated[DocumentRequest, Body()]):
             autorization_list.append(auth_dict)
 
         data_dict['authorization_detail'] = autorization_list
+
         db.local.documents.insert_one(data_dict)
 
         return {
@@ -70,10 +83,8 @@ async def get_by_number(
 
         documents_db_list = db.local.documents.find(request_filter).skip(skip).limit(limit)
         data_db_list = list(documents_db_list)
-
         if (data_db_list):
             data_db_dict = dict(data_db_list[0])
-
             document = DocumentResponseByNumber(
                 number = data_db_dict.get('number'), 
                 amount = data_db_dict.get('total_amount'), 
@@ -82,7 +93,6 @@ async def get_by_number(
                                                     
             for document_db in data_db_list:
                 data_dict = dict(document_db)
-
                 for autorization in data_dict['authorization_detail']:
                     data_detail = DocumentResponseByNumberDetail(
                         authorization_description = autorization.get('authorization_description'),
@@ -183,20 +193,35 @@ async def update_autorized(
     path_file: Annotated[str | None, Query()] = None
 ):
     try:
-        db.local.documents.find_one_and_update(
-            {
-                '_id': ObjectId(id),
-                'authorization_detail': {'$elemMatch': { 'authorization_type': authorization_type }}
-            },
-            {
-                '$set': {
-                    'path_file': path_file,
-                    'authorization_detail.$.autorized': True, 
-                    'authorization_detail.$.approver_comment': comment,
-                    'authorization_detail.$.authorized_date': datetime.now().date().strftime('%Y-%m-%d')
+        if path_file:
+            db.local.documents.find_one_and_update(
+                {
+                    '_id': ObjectId(id),
+                    'authorization_detail': {'$elemMatch': { 'authorization_type': authorization_type }}
+                },
+                {
+                    '$set': {
+                        'path_file': path_file,
+                        'authorization_detail.$.autorized': True, 
+                        'authorization_detail.$.approver_comment': comment,
+                        'authorization_detail.$.authorized_date': datetime.now().date().strftime('%Y-%m-%d')
+                    }
                 }
-            }
-        )
+            )
+        else:
+            db.local.documents.find_one_and_update(
+                {
+                    '_id': ObjectId(id),
+                    'authorization_detail': {'$elemMatch': { 'authorization_type': authorization_type }}
+                },
+                {
+                    '$set': {
+                        'authorization_detail.$.autorized': True, 
+                        'authorization_detail.$.approver_comment': comment,
+                        'authorization_detail.$.authorized_date': datetime.now().date().strftime('%Y-%m-%d')
+                    }
+                }
+            )
         return 'autorized'
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'error, {str(e)}')
