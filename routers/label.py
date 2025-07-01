@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, Query, Body, HTTPException
 
 from db.client import db
-from models.label import LabelAccess, LabelBranch, Label
+from models.label import LabelAccess, LabelBranch, LabelLocation, Label
 from services.label import get_labels
 
 from typing import Annotated
@@ -15,20 +15,27 @@ async def create_access(access: Annotated[LabelAccess, Body()]):
 
     try:
         branchs: list[LabelBranch] = []
+        locations: list[LabelLocation] = []
 
         data_dict = dict(access)
         
         for branch in data_dict['branchs']:
             branch = dict(branch)
+
+            for location in branch['locations']:
+                location = dict(location)
+                locations.append(location)
+
+            branch['locations'] = locations
             branchs.append(branch)
 
         data_dict['branchs'] = branchs
-
         db.local.labels.insert_one(data_dict)
 
         return {
             'message': 'ok'
-        }   
+        }
+    
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'error, {str(e)}')
 
@@ -37,6 +44,7 @@ async def create_access(access: Annotated[LabelAccess, Body()]):
 async def get_access(user: Annotated[str, Query()]):
 
     label_db = db.local.labels.find_one({ 'user': user })
+    print(label_db)
 
     if label_db:
         data_dict = dict(label_db)
@@ -46,7 +54,7 @@ async def get_access(user: Annotated[str, Query()]):
         )
         return user_access
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"error, {str(e)}")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"error, user not found")
     
 
 @router.get('/get_all', response_model=list[Label], status_code=status.HTTP_200_OK)

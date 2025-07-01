@@ -12,9 +12,15 @@ class Label(BaseModel):
     production_date: str | None
 
 
+class LabelLocation(BaseModel):
+    description: str
+    path: str
+
+
 class LabelBranch(BaseModel):
     branch_code: str
     branch_description: str
+    locations: list[LabelLocation]
 
 
 class LabelAccess(BaseModel):
