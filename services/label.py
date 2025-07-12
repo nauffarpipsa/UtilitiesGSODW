@@ -11,7 +11,8 @@ def get_labels(branch_code: str):
     odata_user = os.getenv('USER_ODATA')
     odata_pass = os.getenv('PASS_ODATA')
 
-    odata_link = odata_env.format(branch_code)
+    odata_link = odata_env.format(branch_code, branch_code, branch_code)
+    print(odata_link)
     
     request = requests.get(
             url=odata_link,

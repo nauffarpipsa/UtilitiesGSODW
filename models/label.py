@@ -17,12 +17,40 @@ class LabelLocation(BaseModel):
     path: str
 
 
+class LabelLocationResponse(LabelLocation):
+    active: bool | None = None
+
+
 class LabelBranch(BaseModel):
     branch_code: str
     branch_description: str
     locations: list[LabelLocation]
 
 
+class LabelBranchResponse(BaseModel):
+    branch_code: str
+    branch_description: str
+    locations: list[LabelLocationResponse]
+    active: bool | None = None
+
+
 class LabelAccess(BaseModel):
     user: str
     branchs: list[LabelBranch]
+
+
+class LabelAccessResponse(BaseModel):
+    user: str
+    branchs: list[LabelBranchResponse]
+    active: bool | None = None
+
+
+class LabelQuantity(BaseModel):
+    quantity_printer: int
+    label: Label
+
+
+class PrintLabel(BaseModel):
+    path: str
+    labels: list[LabelQuantity]
+    

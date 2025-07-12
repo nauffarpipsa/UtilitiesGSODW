@@ -11,6 +11,7 @@ import shutil
 
 router = APIRouter(prefix='/document', tags=['Document'])
 
+# post's
 @router.post(path='/create', status_code=status.HTTP_201_CREATED, description='Endpoint for Marvin')
 async def create(documents: Annotated[DocumentRequest, Body()]):
     try:
@@ -63,6 +64,21 @@ async def create(documents: Annotated[DocumentRequest, Body()]):
         raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED, detail=f'error, {str(e)}')
 
 
+@router.post(path='/uploadfile', status_code=status.HTTP_200_OK, description='Endpoint for Peter')
+async def upload_file(file: UploadFile):
+    
+    try:
+        file_location = os.path.join('./uploads', file.filename)
+
+        with open(file_location, "wb+") as file_object:
+            shutil.copyfileobj(file.file, file_object)
+
+        return { "path": file_location }
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED, detail=f'error, {str(e)}')
+
+
+# get's
 @router.get(path='/get_by_number/{number}', response_model=DocumentResponseByNumber | None, status_code=status.HTTP_200_OK, description='Endpoint for Marvin')
 async def get_by_number(
     number: Annotated[str, Path()],
@@ -185,6 +201,7 @@ async def get_by_date(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'error, {str(e)}')
     
 
+# put's
 @router.put(path='/update_autorized/{id}', status_code=status.HTTP_200_OK, description='Endpoint for Peter')
 async def update_autorized(
     id: Annotated[str, Path()], 
@@ -274,17 +291,3 @@ async def update_canceled(
             
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f'error, {str(e)}')
-    
-
-@router.post(path='/uploadfile', status_code=status.HTTP_200_OK, description='Endpoint for Peter')
-async def upload_file(file: UploadFile):
-    
-    try:
-        file_location = os.path.join('./uploads', file.filename)
-
-        with open(file_location, "wb+") as file_object:
-            shutil.copyfileobj(file.file, file_object)
-
-        return { "path": file_location }
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_304_NOT_MODIFIED, detail=f'error, {str(e)}')
