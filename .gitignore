@@ -1,0 +1,68 @@
+# VS cache
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+
+# Razor/Temp
+*.g.cs
+*.g.vb
+*.g.i.cs
+*.g.i.vb
+*.razor.g.cs
+rjsm*.cache.json
+
+# Logs / dumps / misc
+*.log
+*.tlog
+*.pdb
+*.mdb
+*.opendb
+*.svclog
+*.db
+*.cache
+*.ilk
+
+# Publish artifacts
+*.exe
+*.dll
+*.nupkg
+*.snupkg
+*.appx
+*.appxbundle
+*.msix
+*.msixbundle
+
+# NuGet
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Rider/JetBrains
+.idea/
+*.sln.iml
+
+# Coverage
+coverage*/
+*.coverage
+*.coveragexml
+
+# Others
+*.swp
+~$*
+CopernicusTrace
+
+# Environment Variables
+.env
