@@ -64,5 +64,16 @@ coverage*/
 ~$*
 CopernicusTrace
 
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Variables de entorno (seguridad)
+.env
+.venv
+env/
+venv/
+
 # Environment Variables
 .env

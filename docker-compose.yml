@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  apiutilitiesgso:
+    image: nauffarpipsa/apiutilitiesgso:latest
+    container_name: apiutilitiesgso
+    user: root
+    restart: unless-stopped
+    ports:
+      - "8080:8000"
+    environment:
+      - USER_ODATA=${USER_ODATA}
+      - PASS_ODATA=${PASS_ODATA}
+      - FOLDER_LABEL=${FOLDER_LABEL}
+      - FILE_LABEL=${FILE_LABEL}
+      - TZ=America/Guatemala
+    volumes:
+      - ${PATH_UPLOADS}:/app/uploads
+      - ${PATH_LABELS}:/app/labels
+
